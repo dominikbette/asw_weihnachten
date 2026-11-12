@@ -22,6 +22,7 @@ import os
 import smtplib
 import ssl
 import sys
+import time
 from email.message import EmailMessage
 from email.utils import formataddr
 
@@ -143,7 +144,9 @@ def send(messages):
         if port != 465:
             smtp.starttls(context=context)
         smtp.login(user, password)
-        for msg in messages:
+        for i, msg in enumerate(messages):
+            if i:
+                time.sleep(1)
             smtp.send_message(msg)
             print(f"Gesendet an {msg['To']}")
 
