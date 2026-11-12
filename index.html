@@ -78,6 +78,10 @@
       transform: translateY(0) rotate(0deg);
     }
 
+    .stage.ready {
+      cursor: pointer;
+    }
+
     .p3 .envelope-wrap {
       transform: translateY(calc(var(--w) * .225));
       transition: transform .9s ease-in-out;
@@ -1073,6 +1077,7 @@
 
       function openEnvelope() {
         busy = true;
+        stage.classList.remove('ready');
         action = 'open';
         updateNav();
         var k = motionQuery.matches ? 0 : 1;
@@ -1101,6 +1106,7 @@
       function finishClose() {
         mode = 'envelope';
         busy = false;
+        stage.classList.add('ready');
         updateNav();
         refocus(-1);
       }
@@ -1109,6 +1115,15 @@
       function skipCurrent() {
         if (!busy) return;
         if (action === 'open') { skip(); return; }
+        if (action === 'intro') {
+          clearTimers();
+          stage.classList.add('instant');
+          phase(1);
+          void stage.offsetWidth;
+          stage.classList.remove('instant');
+          finishIntro();
+          return;
+        }
         clearTimers();
         stage.classList.add('instant');
         for (var i = 2; i <= 6; i++) unphase(i);
@@ -1147,14 +1162,19 @@
         stage.classList.remove('instant');
         void stage.offsetWidth;
 
-        if (motionQuery.matches) { skip(); return; }
-
+        action = 'intro';
         phase(1);
-        later(function () { phase(2); }, 1900);
-        later(function () { phase(3); }, 3500);
-        later(function () { phase(4); }, 4700);
-        later(function () { phase(5); revealCard(); }, 5900);
-        later(function () { phase(6); finish(); }, 7500);
+        if (motionQuery.matches) { skipCurrent(); return; }
+        /* Das Kuvert landet und wartet; geöffnet wird erst per Klick */
+        later(finishIntro, 1900);
+      }
+
+      function finishIntro() {
+        clearTimers();
+        mode = 'envelope';
+        busy = false;
+        stage.classList.add('ready');
+        updateNav();
       }
 
       function skip() {
@@ -1182,7 +1202,7 @@
       });
 
       motionQuery.addEventListener && motionQuery.addEventListener('change', function (e) {
-        if (e.matches && !started) skip();
+        if (e.matches && busy && action === 'intro') skipCurrent();
       });
 
       play();
