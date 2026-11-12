@@ -30,13 +30,14 @@ python send_mails.py https://dominikbette.github.io/asw_weihnachten/ --export Ko
 python send_mails.py https://dominikbette.github.io/asw_weihnachten/
 ```
 
-SMTP-Zugangsdaten per Umgebungsvariablen (PowerShell):
+SMTP-Zugangsdaten stehen in einer lokalen Datei `.env` (nicht im Repository, siehe `.gitignore`).
+Vorlage: [.env.example](.env.example) nach `.env` kopieren und Werte eintragen:
 
 ```
-$env:SMTP_HOST = "smtp.example.org"; $env:SMTP_PORT = "587"
-$env:SMTP_USER = "name@example.org"; $env:SMTP_PASSWORD = "..."
-$env:MAIL_FROM = "name@example.org"   # optional
+Copy-Item .env.example .env
 ```
+
+Alternativ können die Variablen als Umgebungsvariablen gesetzt werden; diese haben Vorrang vor `.env`.
 
 ## Veröffentlichen (GitHub Pages)
 

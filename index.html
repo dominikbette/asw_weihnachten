@@ -482,6 +482,13 @@
       display: none;
     }
 
+    /* Auf Touch-Geräten wird per Tippen bedient (Kuvert öffnen, Karte wenden) */
+    @media (hover: none) and (pointer: coarse) {
+      .nav {
+        display: none;
+      }
+    }
+
     /* ---------- Reduzierte Bewegung ---------- */
     @media (prefers-reduced-motion: reduce) {
 

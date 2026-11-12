@@ -8,7 +8,8 @@ Beispiele:
     python send_mails.py https://dominikbette.github.io/asw_weihnachten/ --export Kontakte_Links.csv
     python send_mails.py https://dominikbette.github.io/asw_weihnachten/
 
-SMTP-Zugangsdaten kommen aus Umgebungsvariablen (nicht ins Repository schreiben):
+SMTP-Zugangsdaten kommen aus einer Datei .env (Vorlage: .env.example) oder aus Umgebungsvariablen
+(nicht ins Repository schreiben; bereits gesetzte Umgebungsvariablen haben Vorrang):
     SMTP_HOST, SMTP_PORT (Standard 587, STARTTLS; 465 = SSL), SMTP_USER, SMTP_PASSWORD, MAIL_FROM (optional)
 """
 import argparse
@@ -33,6 +34,21 @@ MAILS = {
         "body": "{anrede},\n\nwe have prepared a Christmas card:\n{link}\n\n{signatur}\n",
     },
 }
+
+
+def load_env(path):
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8-sig") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            value = value.strip()
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+                value = value[1:-1]
+            os.environ.setdefault(key.strip(), value)
 
 
 def read_contacts(path):
@@ -99,6 +115,8 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Nur anzeigen, nichts senden")
     parser.add_argument("--export", metavar="DATEI", help="Links zusätzlich in eine CSV-Datei schreiben")
     args = parser.parse_args()
+
+    load_env(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
     contacts = read_contacts(args.csv)
     links = [build_link(args.base_url, c) for c in contacts]
