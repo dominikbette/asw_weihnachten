@@ -6,8 +6,8 @@
  *   {signatur}  Signatur auf der Karte (Spalte Signatur)
  *   {kuvert}    Anrede auf dem Kuvert  (Spalte Anrede_Kuvert)
  *
- * Die Personalisierung erfolgt über URL-Parameter (siehe README.md):
- *   index.html?lang=de&kuvert=Herr%20Dominik&anrede=Lieber%20Dominik&signatur=Deine%20ASW
+ * Die Personalisierung erfolgt über den URL-Parameter "d" (base64url-kodiertes JSON, siehe README.md),
+ * der von send_mails.py erzeugt wird.
  */
 window.KARTE_CONFIG = {
   defaultLanguage: 'de',

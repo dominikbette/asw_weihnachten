@@ -3,27 +3,40 @@
 ## Texte (Deutsch / Englisch)
 
 Alle Texte der Karte stehen in [config.js](config.js), getrennt für `de` und `en`:
-Vorderseite (`front`), Rückseite (`back.paragraphs`, ein Eintrag je Absatz), Kuvert (Poststempel, Briefmarke)
-und Briefmarke). Platzhalter: `{anrede}`, `{signatur}`, `{kuvert}`.
+Vorderseite (`front`), Rückseite (`back.paragraphs`, ein Eintrag je Absatz) und Kuvert (Adresse, Poststempel,
+Briefmarke). Platzhalter: `{anrede}`, `{signatur}`, `{kuvert}`.
 
 ## Personalisierung
 
-Pro Empfänger werden Sprache, Anrede auf dem Kuvert, Anrede auf der Karte und Signatur per URL übergeben:
+Sprache, Anrede auf dem Kuvert, Anrede auf der Karte und Signatur stehen base64url-kodiert (JSON) im
+URL-Parameter `d`, nicht im Klartext:
 
 ```
-index.html?lang=en&kuvert=Frau%20Bettina&anrede=Liebe%20Frau%20Meier&signatur=Ihre%20ASW
+index.html?d=eyJsYW5nIjoiZW4iLCJrdXZlcnQiOiJGcmF1IEJldHRpbmEiLCJhbnJlZGUiOiJMaWViZSBGcmF1IE1laWVyIiwic2lnbmF0dXIiOiJJaHJlIEFTVyJ9
 ```
 
-Parameter, die nicht angegeben werden, bleiben leer.
+Das ist nur Kodierung, keine Verschlüsselung: Wer den Link hat, kann ihn dekodieren. Fehlt `d`, bleiben die
+personalisierten Felder leer.
 
-Die Links für alle Kontakte aus [Kontakte.csv](Kontakte.csv) (Spalten `Sprache;Anrede_Kuvert;Anrede_Karte;Signatur`,
-`Sprache` = `DE` oder `EN`) erzeugt:
+## E-Mail-Versand
+
+[send_mails.py](send_mails.py) (nur Python-Standardbibliothek) erzeugt für jeden Kontakt aus `Kontakte.csv`
+(Spalten `Sprache;Anrede_Kuvert;Anrede_Karte;Signatur;Email`, `Sprache` = `DE` oder `EN`) den Link und sendet die Mail.
+Betreff und Text der Mail stehen oben im Skript (`MAILS`).
 
 ```
-node generate_links.js https://example.org/asw_weihnachten/index.html
+python send_mails.py https://dominikbette.github.io/asw_weihnachten/ --dry-run
+python send_mails.py https://dominikbette.github.io/asw_weihnachten/ --export Kontakte_Links.csv
+python send_mails.py https://dominikbette.github.io/asw_weihnachten/
 ```
 
-Das Ergebnis steht in `Kontakte_Links.csv` (zusätzliche Spalte `Link`).
+SMTP-Zugangsdaten per Umgebungsvariablen (PowerShell):
+
+```
+$env:SMTP_HOST = "smtp.example.org"; $env:SMTP_PORT = "587"
+$env:SMTP_USER = "name@example.org"; $env:SMTP_PASSWORD = "..."
+$env:MAIL_FROM = "name@example.org"   # optional
+```
 
 ## Veröffentlichen (GitHub Pages)
 

@@ -783,18 +783,31 @@
       var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
       /* ---------- Texte und Personalisierung ----------
-         Texte: config.js. Personalisierung per URL:
-         ?lang=de|en&kuvert=...&anrede=...&signatur=... */
+         Texte: config.js. Personalisierung: ?d=<base64url(JSON)> mit
+         {"lang":"de|en","kuvert":"...","anrede":"...","signatur":"..."} (erzeugt von send_mails.py) */
       var CONFIG = window.KARTE_CONFIG;
-      var params = new URLSearchParams(location.search);
-      var lang = (params.get('lang') || CONFIG.defaultLanguage || 'de').toLowerCase();
+
+      function decodeData(raw) {
+        try {
+          var b64 = raw.replace(/-/g, '+').replace(/_/g, '/');
+          while (b64.length % 4) b64 += '=';
+          var bin = atob(b64), bytes = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+          return JSON.parse(new TextDecoder().decode(bytes)) || {};
+        } catch (e) {
+          return {};
+        }
+      }
+
+      var data = decodeData(new URLSearchParams(location.search).get('d') || '');
+      var lang = String(data.lang || CONFIG.defaultLanguage || 'de').toLowerCase();
       if (!CONFIG[lang]) lang = CONFIG.defaultLanguage;
       var T = CONFIG[lang];
 
       var values = {
-        kuvert: params.get('kuvert') || '',
-        anrede: params.get('anrede') || '',
-        signatur: params.get('signatur') || ''
+        kuvert: String(data.kuvert || ''),
+        anrede: String(data.anrede || ''),
+        signatur: String(data.signatur || '')
       };
 
       function fill(template, extra) {
