@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e9edf4">
+  <meta name="description" content="Eine animierte Weihnachtskarte mit Kuvert, Schneekugel und Grußbotschaft.">
+  <title>Frohes Fest – Weihnachtskarte</title>
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9D%84%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <style>
+    :root {
+      --navy: #0d2137;
+      --ink: #1c2b3d;
+      --paper: #f3f3f4;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: #e9edf4;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    /* ---------- Bühne ---------- */
+    .stage {
+      --w: min(92vw, 800px, 72vh);
+      --u: calc(var(--w) / 100);
+      --h: calc(var(--w) * .78);
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(120% 90% at 50% 38%, #fbfcfe 0%, #eef1f7 55%, #dde3ee 100%);
+    }
+
+    @supports (height: 1dvh) {
+      .stage {
+        --w: min(92vw, 800px, 72dvh);
+      }
+    }
+
+    .stage.instant *,
+    .stage.instant *::before,
+    .stage.instant *::after {
+      transition: none !important;
+    }
+
+    /* ---------- Kuvert ---------- */
+    .envelope-wrap {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: var(--w);
+      height: var(--h);
+      margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2);
+      transform: translateY(-135vh) rotate(-3deg);
+      transition: transform 1.5s cubic-bezier(.3, 1.15, .45, 1);
+    }
+
+    .p1 .envelope-wrap {
+      transform: translateY(0) rotate(0deg);
+    }
+
+    .p3 .envelope-wrap {
+      transform: translateY(calc(var(--w) * .225));
+      transition: transform .9s ease-in-out;
+    }
+
+    .p5 .envelope-wrap {
+      pointer-events: none;
+    }
+
+    .env-shadow {
+      position: absolute;
+      left: 6%;
+      right: 6%;
+      bottom: -7%;
+      height: 9%;
+      background: radial-gradient(closest-side, rgba(20, 30, 50, .32), transparent);
+      opacity: 0;
+      transition: opacity 1s ease .4s;
+    }
+
+    .p1 .env-shadow {
+      opacity: 1;
+    }
+
+    .envelope {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      transform: perspective(1600px) rotateY(0deg);
+      transition: transform 1.3s cubic-bezier(.55, 0, .25, 1);
+    }
+
+    .p2 .envelope {
+      transform: perspective(1600px) rotateY(180deg);
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .face.back {
+      transform: rotateY(180deg);
+    }
+
+    .paper {
+      background-color: var(--paper);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        linear-gradient(180deg, #fbfbfb 0%, #f1f1f2 55%, #e4e4e7 100%);
+      border-radius: 3px;
+      box-shadow: 0 2px 3px rgba(20, 30, 50, .18), 0 calc(var(--w) * .03) calc(var(--w) * .05) rgba(20, 30, 50, .28);
+    }
+
+    /* Vorderseite */
+    .stamp {
+      position: absolute;
+      right: 8%;
+      top: 7%;
+      width: 17%;
+      filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .3));
+    }
+
+    .postmark {
+      position: absolute;
+      right: 15%;
+      top: 15%;
+      width: 21%;
+      color: #333;
+      opacity: .8;
+      transform: rotate(-8deg);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .stamp svg,
+    .postmark svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .address {
+      position: absolute;
+      right: 7%;
+      left: 10%;
+      top: 70%;
+      margin: 0;
+      text-align: right;
+      font: italic 400 calc(var(--w) * .06) / 1.2 "Times New Roman", Times, Georgia, serif;
+      color: #26282c;
+    }
+
+    /* Rückseite */
+    .inner {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(180deg, #d4d6de, #e8e9ee);
+      border-radius: 3px;
+      box-shadow: 0 2px 3px rgba(20, 30, 50, .18), 0 calc(var(--w) * .03) calc(var(--w) * .05) rgba(20, 30, 50, .28);
+    }
+
+    .pocket {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      filter: drop-shadow(0 -1px 2px rgba(20, 30, 50, .22));
+    }
+
+    .pocket>div {
+      position: absolute;
+      inset: 0;
+    }
+
+    .pocket-bg {
+      background: linear-gradient(180deg, #f7f7f8, #ececef);
+      clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%);
+      border-radius: 0 0 3px 3px;
+    }
+
+    .tri-l {
+      clip-path: polygon(0 0, 50% 55%, 0 100%);
+      background: linear-gradient(115deg, rgba(255, 255, 255, .7), rgba(0, 0, 0, .07));
+    }
+
+    .tri-r {
+      clip-path: polygon(100% 0, 50% 55%, 100% 100%);
+      background: linear-gradient(245deg, rgba(255, 255, 255, .7), rgba(0, 0, 0, .07));
+    }
+
+    .tri-b {
+      clip-path: polygon(0 100%, 50% 55%, 100% 100%);
+      background: linear-gradient(0deg, rgba(0, 0, 0, .06), rgba(255, 255, 255, .55));
+    }
+
+    .fslot {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      filter: drop-shadow(0 1px 1.5px rgba(20, 30, 50, .3));
+      transition: z-index 0s .42s, opacity .9s ease, translate .9s ease;
+    }
+
+    .p3 .fslot {
+      z-index: 1;
+    }
+
+    .flap {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 58%;
+      transform-origin: 50% 0;
+      transform-style: preserve-3d;
+      transform: perspective(1400px) rotateX(0deg);
+      transition: transform .9s cubic-bezier(.5, 0, .3, 1);
+    }
+
+    .p3 .flap {
+      transform: perspective(1400px) rotateX(180deg);
+    }
+
+    .flap>div {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+
+    .flap-out {
+      background: linear-gradient(180deg, #fafafa 0%, #f0f0f2 60%, #e1e2e6 100%);
+    }
+
+    .flap>.flap-in {
+      transform: rotateX(180deg);
+      background: linear-gradient(0deg, #dcdee5 0%, #eceef2 70%, #f6f6f8 100%);
+      clip-path: polygon(0 100%, 100% 100%, 50% 0);
+    }
+
+    .p5 .inner,
+    .p5 .pocket,
+    .p5 .fslot,
+    .p5 .env-shadow {
+      opacity: 0;
+      translate: 0 calc(var(--w) * .25);
+    }
+
+    .inner,
+    .pocket {
+      transition: opacity .9s ease, translate .9s ease;
+    }
+
+    /* ---------- Karte ---------- */
+    .card {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 2;
+      width: var(--w);
+      height: calc(var(--w) * 1.07);
+      margin: calc(var(--w) * -.535) 0 0 calc(var(--w) * -.5);
+      transform: translateY(calc(var(--w) * -.03)) scale(.672);
+      transition: transform 1.1s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .p4 .card {
+      transform: translateY(calc(var(--w) * -.5)) scale(.672);
+    }
+
+    .p5 .card {
+      transform: translateY(calc(var(--w) * -.225)) scale(1);
+      transition: transform 1.5s cubic-bezier(.35, 0, .15, 1);
+      pointer-events: auto;
+    }
+
+    .card-flip {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      transform: perspective(1800px) rotateY(0deg);
+      transition: transform 1.1s cubic-bezier(.45, 0, .2, 1);
+    }
+
+    .flipped .card-flip {
+      transform: perspective(1800px) rotateY(180deg);
+    }
+
+    .cface {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      background: radial-gradient(90% 70% at 50% 40%, #12304f 0%, var(--navy) 70%);
+      box-shadow: 0 2px 4px rgba(10, 20, 40, .25), 0 calc(var(--w) * .035) calc(var(--w) * .07) rgba(10, 20, 40, .35);
+      border-radius: 2px;
+      color: #fff;
+    }
+
+    .cface.back-face {
+      transform: rotateY(180deg);
+    }
+
+    .bd {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: calc(var(--u) * 17);
+      pointer-events: none;
+    }
+
+    .bd.top {
+      top: 0;
+    }
+
+    .bd.bottom {
+      bottom: 0;
+    }
+
+    .bd svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .script {
+      font-family: "Apple Chancery", "Lucida Calligraphy", "URW Chancery L", "Monotype Corsiva", "Segoe Script", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      font-style: italic;
+    }
+
+    /* Schneekugel */
+    .globe {
+      position: absolute;
+      left: calc(var(--u) * 23);
+      top: calc(var(--u) * 15);
+      width: calc(var(--u) * 54);
+      height: calc(var(--u) * 54);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .globe svg,
+    .globe canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .globe canvas {
+      inset: 2%;
+      width: 96%;
+      height: 96%;
+      border-radius: 50%;
+    }
+
+    .gbase {
+      position: absolute;
+      left: calc(var(--u) * 36);
+      top: calc(var(--u) * 64);
+      width: calc(var(--u) * 28);
+      height: calc(var(--u) * 14);
+      display: block;
+    }
+
+    .greeting {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(var(--u) * 82.5);
+      margin: 0;
+      text-align: center;
+      font-size: calc(var(--u) * 7.0);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: .08em;
+    }
+
+    .message {
+      position: absolute;
+      left: calc(var(--u) * 10);
+      right: calc(var(--u) * 10);
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: center;
+    }
+
+    .message p {
+      margin: 0;
+      font-size: calc(var(--u) * 4.0);
+      line-height: 1.4;
+      text-wrap: balance;
+    }
+
+    .message p+p {
+      margin-top: 1.4em;
+      font-size: calc(var(--u) * 4.0);
+    }
+
+    /* ---------- Bedienelemente ---------- */
+    .nav {
+      position: absolute;
+      top: 50%;
+      z-index: 10;
+      width: 48px;
+      height: 64px;
+      margin-top: -32px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      background: none;
+      color: var(--navy);
+      cursor: pointer;
+      transition: opacity .25s, transform .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav svg {
+      width: 32px;
+      height: 32px;
+      display: block;
+      stroke-width: 1.25;
+      filter: drop-shadow(0 0 2px rgba(255, 255, 255, .95));
+    }
+
+    .nav.prev {
+      left: max(4px, calc(50% - var(--w) / 2 - 56px));
+    }
+
+    .nav.next {
+      right: max(4px, calc(50% - var(--w) / 2 - 56px));
+    }
+
+    .nav.prev:hover:not(:disabled) {
+      transform: translateX(-3px);
+    }
+
+    .nav.next:hover:not(:disabled) {
+      transform: translateX(3px);
+    }
+
+    .nav:focus-visible {
+      outline: 2px solid #4aa3d8;
+      outline-offset: 2px;
+    }
+
+    .nav:disabled {
+      opacity: .2;
+      cursor: default;
+    }
+
+    .nav[hidden] {
+      display: none;
+    }
+
+    /* ---------- Reduzierte Bewegung ---------- */
+    @media (prefers-reduced-motion: reduce) {
+
+      .stage *,
+      .stage *::before,
+      .stage *::after {
+        transition-duration: .01ms !important;
+        transition-delay: 0s !important;
+      }
+    }
+  </style>
+  <noscript>
+    <style>
+      .envelope-wrap {
+        transform: none !important;
+        pointer-events: none;
+      }
+
+      .envelope {
+        transform: none !important;
+      }
+
+      .face.front,
+      .inner,
+      .pocket,
+      .fslot,
+      .env-shadow {
+        display: none;
+      }
+
+      .face.back {
+        transform: none;
+        backface-visibility: visible;
+      }
+
+      .card {
+        transform: none !important;
+      }
+
+      .nav {
+        display: none;
+      }
+    </style>
+  </noscript>
+</head>
+
+<body>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <g id="arm" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M0 0V-44M0 -13L-9 -22M0 -13L9 -22M0 -26L-8 -34M0 -26L8 -34M-4 -40L0 -45L4 -40" />
+      </g>
+      <symbol id="flake" viewBox="-50 -50 100 100">
+        <use href="#arm" />
+        <use href="#arm" transform="rotate(60)" />
+        <use href="#arm" transform="rotate(120)" />
+        <use href="#arm" transform="rotate(180)" />
+        <use href="#arm" transform="rotate(240)" />
+        <use href="#arm" transform="rotate(300)" />
+      </symbol>
+      <symbol id="bloom" viewBox="-50 -50 100 100">
+        <g fill="currentColor">
+          <ellipse cy="-31" rx="7" ry="17" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(30)" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(60)" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(90)" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(120)" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(150)" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(180)" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(210)" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(240)" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(270)" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(300)" />
+          <ellipse cy="-31" rx="7" ry="17" transform="rotate(330)" />
+          <circle r="17" />
+        </g>
+        <circle r="7" style="fill:var(--navy)" />
+      </symbol>
+      <linearGradient id="silver" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="#5d6772" />
+        <stop offset=".18" stop-color="#d9dfe5" />
+        <stop offset=".38" stop-color="#9aa4af" />
+        <stop offset=".6" stop-color="#f3f6f8" />
+        <stop offset=".82" stop-color="#8a95a1" />
+        <stop offset="1" stop-color="#454d56" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <h1 class="visually-hidden">Weihnachtskarte: Frohes Fest</h1>
+  <p class="visually-hidden" id="status" role="status" aria-live="polite"></p>
+
+  <main class="stage" id="stage">
+
+    <div class="envelope-wrap">
+      <div class="env-shadow" aria-hidden="true"></div>
+      <div class="envelope">
+
+        <!-- Vorderseite des Kuverts -->
+        <div class="face front paper" aria-hidden="true">
+          <div class="postmark">
+            <svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-linecap="round">
+              <path d="M2 10q8-5 16 0t16 0t16 0M2 22q8-5 16 0t16 0t16 0M2 34q8-5 16 0t16 0t16 0M2 46q8-5 16 0t16 0t16 0"
+                stroke-width="1.3" />
+              <circle cx="82" cy="36" r="29" stroke-width="1.4" />
+              <circle cx="82" cy="36" r="20" stroke-width="1" />
+              <path id="pmPath" d="M82 36m-24.5 0a24.5 24.5 0 1 1 49 0a24.5 24.5 0 1 1 -49 0" stroke="none" />
+              <text font-size="6.4" font-family="Arial, sans-serif" fill="currentColor" stroke="none"
+                letter-spacing="1.2">
+                <textPath href="#pmPath" startOffset="2">WEIHNACHTSPOST · 24.12. ·</textPath>
+              </text>
+              <text x="82" y="38.5" text-anchor="middle" font-size="7" font-family="Arial, sans-serif"
+                fill="currentColor" stroke="none">2025</text>
+            </svg>
+          </div>
+          <div class="stamp">
+            <svg viewBox="0 0 100 120">
+              <rect x="2" y="2" width="96" height="116" fill="#f0e9d9" />
+              <rect x="2" y="2" width="96" height="116" fill="none" stroke="#f3f3f4" stroke-width="4.5"
+                stroke-dasharray="0.1 6" stroke-linecap="round" />
+              <rect x="9" y="9" width="82" height="102" fill="#7a6797" />
+              <path d="M50 30L37 56H44L31 80H69L56 56H63Z" fill="#f4eef8" />
+              <rect x="47" y="80" width="6" height="7" fill="#f4eef8" />
+              <circle cx="50" cy="27" r="3.2" fill="#f4eef8" />
+              <text x="50" y="21" text-anchor="middle" font-size="9" font-family="Georgia, serif" letter-spacing="1.5"
+                fill="#d9cfe8">FROHES</text>
+              <text x="50" y="102" text-anchor="middle" font-size="12" font-family="Georgia, serif" letter-spacing="2"
+                fill="#f4eef8">FEST</text>
+            </svg>
+          </div>
+          <p class="address" id="address">Herr Dominik</p>
+        </div>
+
+        <!-- Rückseite des Kuverts mit Klappe -->
+        <div class="face back">
+          <div class="inner" aria-hidden="true"></div>
+
+          <article class="card" id="card" aria-hidden="true" aria-label="Weihnachtskarte">
+            <div class="card-flip">
+
+              <section class="cface front-face" id="cardFront" aria-label="Vorderseite">
+                <div class="bd top" data-border="7"></div>
+                <div class="bd bottom" data-border="21" data-bottom></div>
+
+                <div class="globe" id="globe" role="img" aria-label="Weihnachtskugel mit Tannenbaum, in der es schneit">
+                  <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <defs>
+                      <radialGradient id="gbg" cx=".5" cy=".35" r=".75">
+                        <stop offset="0" stop-color="#17395c" />
+                        <stop offset="1" stop-color="#0a1c31" />
+                      </radialGradient>
+                      <linearGradient id="t1" x1="0" x2="1">
+                        <stop offset="0" stop-color="#9adaf0" />
+                        <stop offset=".55" stop-color="#4aa3cc" />
+                        <stop offset="1" stop-color="#1f6a93" />
+                      </linearGradient>
+                      <linearGradient id="t2" x1="0" x2="1">
+                        <stop offset="0" stop-color="#7ccbe6" />
+                        <stop offset=".55" stop-color="#3b95bf" />
+                        <stop offset="1" stop-color="#1a5f87" />
+                      </linearGradient>
+                      <radialGradient id="orb" cx=".35" cy=".3" r=".8">
+                        <stop offset="0" stop-color="#fff" />
+                        <stop offset="1" stop-color="#9fb2c6" />
+                      </radialGradient>
+                      <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#eaf2f8" />
+                        <stop offset="1" stop-color="#b9c9d8" />
+                      </linearGradient>
+                      <clipPath id="gclip">
+                        <circle cx="50" cy="50" r="47.2" />
+                      </clipPath>
+                    </defs>
+                    <circle cx="50" cy="50" r="47.5" fill="url(#gbg)" />
+                    <g clip-path="url(#gclip)">
+                      <ellipse cx="50" cy="97" rx="46" ry="10" fill="url(#ground)" />
+                      <g stroke-linejoin="round" stroke-width="2.4">
+                        <rect x="47" y="84" width="6" height="8" fill="#4a5560" />
+                        <polygon points="50,52 28,88 72,88" fill="url(#t1)" stroke="url(#t1)" />
+                        <polygon points="50,40 33,72 67,72" fill="url(#t2)" stroke="url(#t2)" />
+                        <polygon points="50,28 37,56 63,56" fill="url(#t1)" stroke="url(#t1)" />
+                        <polygon points="50,17 41,38 59,38" fill="url(#t2)" stroke="url(#t2)" />
+                        <g fill="none" stroke="#d6f0fa" stroke-width=".7" stroke-linecap="round" opacity=".55">
+                          <path
+                            d="M44 33l3 3M52 26l-3 3M39 50l4 3M58 50l-4 3M34 66l5 4M65 66l-5 4M32 80l6 4M45 78l5 4M60 82l6 3" />
+                        </g>
+                        <g stroke="none">
+                          <circle cx="46" cy="36" r="1.5" fill="url(#orb)" />
+                          <circle cx="55" cy="46" r="1.6" fill="url(#orb)" />
+                          <circle cx="45" cy="52" r="1.7" fill="url(#orb)" />
+                          <circle cx="57" cy="60" r="1.8" fill="url(#orb)" />
+                          <circle cx="41" cy="66" r="1.8" fill="url(#orb)" />
+                          <circle cx="52" cy="70" r="1.8" fill="url(#orb)" />
+                          <circle cx="62" cy="72" r="1.6" fill="url(#orb)" />
+                          <circle cx="36" cy="78" r="1.8" fill="url(#orb)" />
+                          <circle cx="48" cy="82" r="2" fill="url(#orb)" />
+                          <circle cx="60" cy="83" r="1.9" fill="url(#orb)" />
+                          <circle cx="68" cy="84" r="1.5" fill="url(#orb)" />
+                          <circle cx="50" cy="60" r="1.2" fill="#cfd8e2" />
+                          <circle cx="43" cy="44" r="1.1" fill="#cfd8e2" />
+                          <circle cx="30" cy="85" r="1.2" fill="#cfd8e2" />
+                        </g>
+                        <polygon
+                          points="50,9.5 51.5,13.5 55.5,13.6 52.3,16 53.5,20 50,17.7 46.5,20 47.7,16 44.5,13.6 48.5,13.5"
+                          fill="#d5dce4" stroke="#aab4bf" stroke-width=".4" />
+                      </g>
+                    </g>
+                  </svg>
+                  <canvas id="snow" aria-hidden="true"></canvas>
+                  <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <defs>
+                      <radialGradient id="gfill" cx=".5" cy=".5" r=".5">
+                        <stop offset=".72" stop-color="#fff" stop-opacity="0" />
+                        <stop offset="1" stop-color="#fff" stop-opacity=".16" />
+                      </radialGradient>
+                      <linearGradient id="grim" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#fff" stop-opacity=".85" />
+                        <stop offset=".5" stop-color="#cfd9e3" stop-opacity=".35" />
+                        <stop offset="1" stop-color="#fff" stop-opacity=".6" />
+                      </linearGradient>
+                      <linearGradient id="ghl" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#fff" stop-opacity=".5" />
+                        <stop offset="1" stop-color="#fff" stop-opacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="48" fill="url(#gfill)" stroke="url(#grim)" stroke-width="1.6" />
+                    <circle cx="50" cy="50" r="46.4" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width=".6" />
+                    <ellipse cx="29" cy="22" rx="17" ry="7.5" transform="rotate(-38 29 22)" fill="url(#ghl)" />
+                    <path d="M80 70A38 38 0 0 1 56 88" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="1.6"
+                      stroke-linecap="round" />
+                    <circle cx="84" cy="62" r="1.2" fill="#fff" fill-opacity=".5" />
+                  </svg>
+                </div>
+
+                <svg class="gbase" viewBox="0 0 100 50" aria-hidden="true" focusable="false">
+                  <rect x="6" y="0" width="88" height="9" rx="3.5" fill="url(#silver)" />
+                  <line x1="12" y1="4.5" x2="88" y2="4.5" stroke="#3b434b" stroke-opacity=".7" stroke-width="2"
+                    stroke-dasharray="0.1 2.6" stroke-linecap="round" />
+                  <path d="M10 9H90L100 41H0Z" fill="url(#silver)" />
+                  <path d="M10 9H90L91 13H9Z" fill="#000" fill-opacity=".18" />
+                  <rect x="0" y="40" width="100" height="9" rx="3.5" fill="url(#silver)" />
+                  <line x1="6" y1="44.5" x2="94" y2="44.5" stroke="#3b434b" stroke-opacity=".7" stroke-width="2"
+                    stroke-dasharray="0.1 2.6" stroke-linecap="round" />
+                </svg>
+
+                <p class="greeting script">Frohes Fest</p>
+              </section>
+
+              <section class="cface back-face" id="cardBack" aria-label="Rückseite">
+                <div class="bd top" data-border="3"></div>
+                <div class="bd bottom" data-border="11" data-bottom></div>
+                <div class="message script">
+                  <p>Wir wünschen glückliche und besinnliche Feiertage und Alles Gute fürs Neue Jahr!</p>
+                  <p id="from">Beispiel Firma</p>
+                </div>
+              </section>
+
+            </div>
+          </article>
+
+          <div class="pocket" aria-hidden="true">
+            <div class="pocket-bg"></div>
+            <div class="tri-l"></div>
+            <div class="tri-r"></div>
+            <div class="tri-b"></div>
+          </div>
+          <div class="fslot" aria-hidden="true">
+            <div class="flap">
+              <div class="flap-out"></div>
+              <div class="flap-in"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <button type="button" class="nav prev" id="prevBtn" aria-label="Zur Vorderseite" hidden disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+        stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M15 4l-8 8 8 8" />
+      </svg>
+    </button>
+    <button type="button" class="nav next" id="nextBtn" aria-label="Zur Rückseite" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+        stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M9 4l8 8-8 8" />
+      </svg>
+    </button>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var stage = document.getElementById('stage');
+      var card = document.getElementById('card');
+      var front = document.getElementById('cardFront');
+      var back = document.getElementById('cardBack');
+      var globe = document.getElementById('globe');
+      var prevBtn = document.getElementById('prevBtn');
+      var nextBtn = document.getElementById('nextBtn');
+      var statusEl = document.getElementById('status');
+      var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      /* Empfänger und Absender per URL anpassbar: ?an=Frau%20Muster&von=Muster%20GmbH */
+      var params = new URLSearchParams(location.search);
+      if (params.get('an')) document.getElementById('address').textContent = params.get('an');
+      if (params.get('von')) document.getElementById('from').textContent = params.get('von');
+
+      function say(text) {
+        statusEl.textContent = '';
+        setTimeout(function () { statusEl.textContent = text; }, 50);
+      }
+
+      /* ---------- Schneeflocken-Ränder ---------- */
+      function rng(seed) {
+        return function () {
+          seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+          var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+          t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+      }
+
+      function buildBorder(seed, bottom) {
+        var r = rng(seed), n = 14, items = [], i;
+        for (i = 0; i < n; i++) {
+          var x = (i + .5) * (600 / n) + (r() - .5) * 34;
+          var size = 46 + r() * 54;
+          var off = 6 + r() * 40;
+          items.push({
+            x: x, size: size,
+            y: bottom ? 102 - off : off,
+            bloom: i % 3 === 1,
+            rot: Math.floor(r() * 60),
+            op: .5 + r() * .45,
+            light: r() > .45
+          });
+        }
+        items.sort(function (a, b) { return b.bloom - a.bloom; });
+        var s = '';
+        items.forEach(function (it) {
+          var color = it.bloom ? '#6f84a0' : (it.light ? '#dbe4ee' : '#9fb1c6');
+          s += '<use href="#' + (it.bloom ? 'bloom' : 'flake') + '" x="' + (it.x - it.size / 2).toFixed(1) +
+            '" y="' + (it.y - it.size / 2).toFixed(1) + '" width="' + it.size.toFixed(1) + '" height="' + it.size.toFixed(1) +
+            '" transform="rotate(' + it.rot + ' ' + it.x.toFixed(1) + ' ' + it.y.toFixed(1) + ')" style="color:' + color +
+            ';opacity:' + it.op.toFixed(2) + '"/>';
+        });
+        return '<svg viewBox="0 0 600 102" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">' + s + '</svg>';
+      }
+
+      Array.prototype.forEach.call(document.querySelectorAll('.bd'), function (el) {
+        el.innerHTML = buildBorder(+el.dataset.border, el.hasAttribute('data-bottom'));
+      });
+
+      /* ---------- Schneefall in der Kugel ---------- */
+      var canvas = document.getElementById('snow');
+      var ctx = canvas.getContext('2d');
+      var size = 0, parts = [], raf = 0, last = 0, clock = 0, snowOn = false;
+
+      function initParts() {
+        var i, count = 220;
+        parts = [];
+        for (i = 0; i < count; i++) {
+          var depth = Math.random();
+          parts.push({
+            x: Math.random(), y: Math.random(),
+            r: .004 + depth * depth * .014 + Math.random() * .002,
+            vy: .05 + depth * .15,
+            amp: .01 + Math.random() * .035,
+            f: .6 + Math.random() * 1.6,
+            ph: Math.random() * 6.283,
+            a: .5 + depth * .5,
+            kx: 0, ky: 0
+          });
+        }
+      }
+
+      function resizeCanvas() {
+        var s = canvas.clientWidth;
+        if (!s) return;
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        size = s;
+        canvas.width = canvas.height = Math.round(s * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        if (!parts.length) initParts();
+        draw();
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, size, size);
+        ctx.fillStyle = '#fff';
+        for (var i = 0; i < parts.length; i++) {
+          var p = parts[i], px = p.x * size, py = p.y * size, pr = p.r * size;
+          ctx.globalAlpha = p.a;
+          ctx.beginPath();
+          ctx.arc(px, py, pr, 0, 6.2832);
+          ctx.fill();
+          if (pr > size * .008) {
+            ctx.globalAlpha = p.a * .22;
+            ctx.beginPath();
+            ctx.arc(px, py, pr * 1.9, 0, 6.2832);
+            ctx.fill();
+          }
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function step(dt) {
+        clock += dt;
+        var decay = Math.exp(-2.2 * dt);
+        for (var i = 0; i < parts.length; i++) {
+          var p = parts[i];
+          p.x += Math.sin(clock * p.f + p.ph) * p.amp * dt + p.kx * dt;
+          p.y += (p.vy + p.ky) * dt;
+          p.kx *= decay; p.ky *= decay;
+          if (p.y > 1.03) { p.y = -.03; p.x = Math.random(); }
+          if (p.x < -.05) p.x = 1.05; else if (p.x > 1.05) p.x = -.05;
+        }
+      }
+
+      function frame(ts) {
+        raf = 0;
+        if (!snowOn || document.hidden) return;
+        var dt = Math.min((ts - last) / 1000, .05);
+        last = ts;
+        step(dt);
+        draw();
+        raf = requestAnimationFrame(frame);
+      }
+
+      function startSnow() {
+        snowOn = true;
+        if (motionQuery.matches) { draw(); return; }
+        if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+      }
+
+      function stopSnow() { snowOn = false; }
+
+      function shakeGlobe() {
+        if (motionQuery.matches) return;
+        for (var i = 0; i < parts.length; i++) {
+          parts[i].kx = (Math.random() - .5) * 1.4;
+          parts[i].ky = -Math.random() * .9;
+        }
+        startSnow();
+      }
+
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden && snowOn) startSnow();
+      });
+
+      if ('ResizeObserver' in window) new ResizeObserver(resizeCanvas).observe(canvas);
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      globe.addEventListener('click', function (e) {
+        if (busy) return;
+        e.stopPropagation();
+        if (!flipped) shakeGlobe();
+      });
+
+      /* ---------- Ablauf ---------- */
+      var timers = [], flipped = false, started = false, busy = true, mode = 'envelope', action = 'open';
+
+      function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+      function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+      function phase(n) { stage.classList.add('p' + n); }
+      function unphase(n) { stage.classList.remove('p' + n); }
+
+      function revealCard() {
+        card.removeAttribute('aria-hidden');
+        startSnow();
+      }
+
+      function finish() {
+        started = true;
+        mode = 'front';
+        busy = false;
+        prevBtn.hidden = nextBtn.hidden = false;
+        updateNav();
+        say('Weihnachtskarte, Vorderseite: Frohes Fest. Mit dem Pfeil nach rechts sehen Sie die Rückseite, mit dem Pfeil nach links schließen Sie das Kuvert wieder.');
+      }
+
+      function updateNav() {
+        prevBtn.disabled = busy || mode === 'envelope';
+        nextBtn.disabled = busy || mode === 'back';
+        prevBtn.setAttribute('aria-label', mode === 'back' ? 'Zur Vorderseite' : 'Zurück zum Kuvert');
+        nextBtn.setAttribute('aria-label', mode === 'envelope' ? 'Karte aus dem Kuvert ziehen' : 'Zur Rückseite');
+      }
+
+      /* Fokus bleibt bei der Bedienung per Tastatur erhalten, auch wenn ein Pfeil deaktiviert wird */
+      function refocus(dir) {
+        var a = document.activeElement;
+        if (a && a !== document.body && a !== prevBtn && a !== nextBtn) return;
+        var first = dir > 0 ? nextBtn : prevBtn, second = dir > 0 ? prevBtn : nextBtn;
+        (first.disabled ? second : first).focus({ preventScroll: true });
+      }
+
+      function setFlip(value) {
+        if (value === flipped) return;
+        flipped = value;
+        mode = value ? 'back' : 'front';
+        stage.classList.toggle('flipped', value);
+        front.inert = value;
+        back.inert = !value;
+        updateNav();
+        refocus(value ? 1 : -1);
+        if (value) {
+          later(stopSnow, 700);
+          say('Rückseite: ' + back.querySelector('p').textContent + ' ' + document.getElementById('from').textContent);
+        } else {
+          clearTimers();
+          startSnow();
+          say('Vorderseite: Frohes Fest.');
+        }
+      }
+
+      function openEnvelope() {
+        busy = true;
+        action = 'open';
+        updateNav();
+        say('Die Karte wird aus dem Kuvert gezogen.');
+        var k = motionQuery.matches ? 0 : 1;
+        later(function () { phase(2); }, 0);
+        later(function () { phase(3); }, 1600 * k);
+        later(function () { phase(4); }, 2800 * k);
+        later(function () { phase(5); revealCard(); }, 4000 * k);
+        later(function () { phase(6); finish(); refocus(1); }, 5600 * k);
+      }
+
+      function closeEnvelope() {
+        busy = true;
+        action = 'close';
+        updateNav();
+        clearTimers();
+        say('Die Karte wird zurück ins Kuvert geschoben.');
+        var k = motionQuery.matches ? 0 : 1;
+        card.setAttribute('aria-hidden', 'true');
+        later(stopSnow, 500 * k);
+        later(function () { unphase(6); unphase(5); }, 0);
+        later(function () { unphase(4); }, 1200 * k);
+        later(function () { unphase(3); }, 2400 * k);
+        later(function () { unphase(2); }, 3500 * k);
+        later(finishClose, 5000 * k);
+      }
+
+      function finishClose() {
+        mode = 'envelope';
+        busy = false;
+        updateNav();
+        refocus(-1);
+        say('Geschlossenes Kuvert. Mit dem Pfeil nach rechts oder einem Klick ziehen Sie die Karte wieder heraus.');
+      }
+
+      /* Klick oder Pfeiltaste während einer Animation springt direkt zum Ziel */
+      function skipCurrent() {
+        if (!busy) return;
+        if (action === 'open') { skip(); return; }
+        clearTimers();
+        stage.classList.add('instant');
+        for (var i = 2; i <= 6; i++) unphase(i);
+        void stage.offsetWidth;
+        stage.classList.remove('instant');
+        stopSnow();
+        finishClose();
+      }
+
+      function go(dir) {
+        if (busy) return;
+        if (dir > 0) {
+          if (mode === 'envelope') openEnvelope();
+          else if (mode === 'front') setFlip(true);
+        } else if (mode === 'back') setFlip(false);
+        else if (mode === 'front') closeEnvelope();
+      }
+
+      function resetState() {
+        clearTimers();
+        stopSnow();
+        mode = 'envelope';
+        action = 'open';
+        busy = true;
+        flipped = false;
+        stage.className = 'stage instant';
+        front.inert = false;
+        back.inert = true;
+        card.setAttribute('aria-hidden', 'true');
+        prevBtn.hidden = nextBtn.hidden = true;
+        void stage.offsetWidth;
+      }
+
+      function play() {
+        resetState();
+        stage.classList.remove('instant');
+        void stage.offsetWidth;
+
+        if (motionQuery.matches) { skip(); return; }
+
+        say('Ein Kuvert wird zugestellt. Ein Klick überspringt die Animation.');
+        phase(1);
+        later(function () { phase(2); }, 1900);
+        later(function () { phase(3); }, 3500);
+        later(function () { phase(4); say('Die Karte wird aus dem Kuvert gezogen.'); }, 4700);
+        later(function () { phase(5); revealCard(); }, 5900);
+        later(function () { phase(6); finish(); }, 7500);
+      }
+
+      function skip() {
+        clearTimers();
+        stage.classList.add('instant');
+        for (var i = 1; i <= 6; i++) phase(i);
+        void stage.offsetWidth;
+        stage.classList.remove('instant');
+        revealCard();
+        finish();
+      }
+
+      prevBtn.addEventListener('click', function () { go(-1); });
+      nextBtn.addEventListener('click', function () { go(1); });
+      card.addEventListener('click', function () { if (!busy && mode !== 'envelope') setFlip(!flipped); });
+      stage.addEventListener('click', function (e) {
+        if (e.target.closest('.nav')) return;
+        if (busy) skipCurrent();
+        else if (mode === 'envelope') go(1);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        if (busy) skipCurrent();
+        else go(e.key === 'ArrowRight' ? 1 : -1);
+      });
+
+      motionQuery.addEventListener && motionQuery.addEventListener('change', function (e) {
+        if (e.matches && !started) skip();
+      });
+
+      play();
+    })();
+  </script>
+</body>
+
+</html>
