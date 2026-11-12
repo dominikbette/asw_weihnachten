@@ -125,6 +125,23 @@
       transform: rotateY(180deg);
     }
 
+    /* Mobile Browser zeigen transformierte Kinder (Poststempel, Briefmarke) trotz backface-visibility */
+    .face.front {
+      transition: visibility 0s;
+    }
+
+    .p2 .face.front {
+      visibility: hidden;
+      transition: visibility 0s .65s;
+    }
+
+    .postmark,
+    .stamp,
+    .address {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
     .paper {
       background-color: var(--paper);
       background-image:
